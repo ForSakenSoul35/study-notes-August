@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <title>原生js实现拖拽对象</title>
+    </head>
+    <body>
+        <script>
+            window.onload = function(){
+                /*
+                    需求描述 如何让一个DOM元素动起来
+                    1. 通过 绝对定位 修改 top left的 值
+                    2. translate 变换
+                    
+                     方法选择：由于修改 一个元素的 top/left的值 会引起页面重绘
+                     而translate不会，从性能方面考虑 使用  translate
+
+                    translate兼容写法
+                    translate是CSS3 的 写法 因此会有兼容性问题，因此需要处理兼容。
+
+                */
+               // 获取当前浏览器支持的 transform的兼容写法
+               // 遍历transformArr数组  判断 divStyle上有哪个transform值
+               // 有的话返回对应的transform 没有的话 表示浏览器不支持这个属性  即需要使用top，left来实现功能
+               function getTransform (){
+                   var transform = '',
+                   divStyle = document.createElement('div').style// 创建一个div 并获取它对应的style属性的值
+                   // 各种浏览器transform的兼容写法
+                   transfromArr = ['transform','webkitTransform','MozTransform','msTransform','OTransform'],
+                   
+                   len = transfromArr.length
+                   
+                   //
+                   for( var i = 0;i++;i<length) {
+                       if(transformArr[i] in divStyle) { // 如果 style属性 这个对象上 有 transform的属性
+                           transform = transformArr[i] // 则 赋值给transform
+                       }
+                   }
+                   // 如果 没有transform的值 则返回初始值 空字符串
+                   return transform
+               }
+               /*
+               如何移动一个元素  
+               计算前后位置差值
+               2D移动
+               translateX()
+               translateY()
+               */ 
+              // 获取初始位置
+               function getStyle(){
+                   // 考虑到ie的兼容性 需要一个特别的函数 来实现
+                   
+               }
+              // 获取鼠标位置
+              // 计算位置差值 
+              // 移动位置
+
+            
+            }
+        </script>
+    </body>
+    
+</html>
