@@ -7,7 +7,7 @@
             window.onload = function(){
                 /*
                     需求描述 如何让一个DOM元素动起来
-                    1. 通过 绝对定位 修改 top left的 值
+                    1. 通过 相对定位 修改 top left的 值
                     2. translate 变换
                     
                      方法选择：由于修改 一个元素的 top/left的值 会引起页面重绘
@@ -44,16 +44,103 @@
                translateX()
                translateY()
                */ 
-              // 获取初始位置
-               function getStyle(){
+              // 获取元素 样式
+               function getStyle(elem, property){
                    // 考虑到ie的兼容性 需要一个特别的函数 来实现
-                   
+                   return document.defaultView.getComputedStyle 
+                    ?  document.defaultView.getComputedStyle(elem,false)[property]
+                    :  elem.currentStyle[property]
+                    /*
+                        getComputedStyle(elem,[..]) 返回一个 对象  包含所有CSS属性的值
+                        返回的是一个实时的 CSSStyleDeclaration  当元素的样式修改时 会自动更新本身
+                        参数1 表示 要获取样式的elem
+                        参数2 指定一个要匹配的伪元素的字符串  必须对普通元素省略 或者null
+                        getComputedStyle(h3, '::after').content;
+                        ## 如何调用
+                        大部分情况下 可以使用window对象直接调用，也可以使用document.defaultView对象调用。
+                        但是在fiefox3.6上 必须使用document.defaultView。
+                        所以为了更好的兼容性写法 建议使用document.defaultView
+                       
+                        IE不支持getComputedStyle 支持 currentStyle来获取样式的所有属性                        
+                    */
                }
+
+              //  获取初始位置
+               function getTargetPos(){
+                   var pos = {x:0,y:0}
+                   var transform = getTransform()
+                   if(transform) {
+                       // 获取transform的值
+                       var transformValue = getStyle(elem,transform);
+                       if(transformValue == "none") {
+                        // 如果没有设置过这个属性 则初始化这个属性
+                        elem.style[transform]= 'translate(0,0)'
+                        return pos
+                       } else {
+                           var temp = transformValue.match(/-?\d+/g)// 正则匹配
+                           return pos ={
+                               x:parseInt(temp(4).trim()),
+                               y:parseInt(temp(5).trim())
+                           }
+
+                       }
+                   } else {
+                       // 表示如果 不支持transform属性  使用top，left来实现移动
+                       if(getStyle(elem,'position')== 'static') { // 如果等于 绝对定位 默认值
+                            elem.style.position = 'relative'
+                            return pos
+                       }else {
+                        var x = parseInt(getStyle(elem, 'left') ? getStyle(elem, 'left') : 0);
+                        var y = parseInt(getStyle(elem, 'top') ? getStyle(elem, 'top') : 0);
+                        return pos = {
+                            x:x,
+                            y:y
+                        }
+ 
+                       }
+                   }
+               }
+            
+               // 设置目标元素的位置
+               function setTargetPos(elem, pos) {
+                var transform = getTransform();
+                if(transform) {
+                    elem.style[transform] = 'translate('+ pos.x +'px, '+ pos.y +'px)';
+                } else {
+                    elem.style.left = pos.x + 'px';
+                    elem.style.top = pos.y + 'px';
+                }
+                return elem;
+                }
               // 获取鼠标位置
               // 计算位置差值 
               // 移动位置
 
-            
+            /*
+             需求描述  推拽一个对象 鼠标到哪 就移动到哪
+             实现思路
+             做法 基于性能问题  选择 transform来做 但是也要考虑不兼容transform的方法
+             1. 获取 transform表示  要支持不同的浏览器 需要使用 浏览器前缀
+             transfromArr = ['transform','webkitTransform','MozTransform','msTransform','OTransform']
+             2. 要通过tranform来改变 首先就要拿到初始位置的值 需要获取transform的属性值
+             但是获取DOM元素的属性 是有 兼容性问题的，因此需要判断
+                兼容区别 主要是在 IE浏览器 和其他浏览器 
+                IE  用的是 elem.currentStyle[属性名]
+                其他浏览器 document.defaultView.getComputedStyle(elem,null)[property]
+                这样就能拿到初始位置的值 这里需要设一个默认值 如果没找到对应的transform属性值 则返回初始值
+             3. 获取 最终位置 即获取鼠标实时位置
+                PC端 鼠标的位置 mousedown 鼠标按下时触发,mousemove 鼠标按下拖动时触发,mouseup 鼠标松开时触发
+                移动端  touchstart、touchmove、touchend
+             4. 拖拽操作
+                事件触发时，可以通过事件对象获取到鼠标的精确位置
+                鼠标按下时触发mousedown事件，记住鼠标的初始位置和元素的初始位置
+                目标是实现鼠标移动时，目标元素的也跟着移动
+                鼠标移动的距离 等于 目标元素 移动距离
+                移动后的鼠标位置 - 鼠标初始位置 = 移动后的目标元素位置 - 目标元素的初始位置
+                即目标元素移动后的位置 = 鼠标移动的距离+ 目标元素的初始位置
+                当结束拖拽时触发 mouseup事件
+
+            */
             }
         </script>
     </body>
