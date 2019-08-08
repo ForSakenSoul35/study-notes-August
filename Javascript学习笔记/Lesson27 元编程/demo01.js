@@ -18,10 +18,9 @@ let handler = {
         console.log("删除name属性")
         delete target[name]
     },
-    enumerate:function(target,name,value){
-
-    }
+    
 }
+// 语法格式
 var p = new Proxy({},handler)
 
 // p.a = 1
@@ -30,6 +29,6 @@ var p = new Proxy({},handler)
 
 // handler  包含陷阱的占位符对象
 // hanler能处理的 get/set/delete/
-for( let i in p){
-    console.log(i)
-}
+// 能够代理一些操作 get set  delete defineProperty
+
+// 撤销代理
